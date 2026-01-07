@@ -1,271 +1,321 @@
-# Auto-NVM 分阶段实现计划
+# Auto-NVM Rust 分阶段实现计划
 
 ## 项目概述
 创建一个跨平台的 Node.js 版本自动切换器，支持 bash、zsh、fish、powershell，在用户 cd 到包含 .nvmrc 文件的目录时自动切换 Node.js 版本。
 
+**技术栈**: Rust + 最小化 Shell 集成脚本
+**性能目标**: < 500ms 切换延迟
+**分发策略**: 灵活支持多种方式 (Cargo/预编译二进制/包管理器)
+
 ---
 
-## 第一阶段：核心功能实现 (MVP)
-**目标**: 实现基本的自动切换功能，支持 bash 和 Unix 环境
+## 第一阶段：Rust 项目初始化 (MVP)
+**目标**: 建立 Cargo 项目基础架构和核心功能
 **预期时间**: 1-2 天
-**成功标准**: 在 bash 环境下能够自动检测 .nvmrc 并切换 Node.js 版本
+**成功标准**: 基本的 .nvmrc 检测和版本切换功能完成
 
 ### 任务清单
 
-#### 1.1 项目基础结构 ⏳
-- [ ] 创建目录结构
+#### 1.1 Cargo 项目初始化 ⏳
+- [ ] 创建 Rust 项目结构
   ```bash
-  mkdir -p src/{core,shells/bash,platform,utils} config tests docs
+  cargo new auto-nvm --bin
+  cd auto-nvm
+  mkdir -p src/{config,nvmrc,nvm,cache} shell-integration/{bash,zsh,fish,powershell} scripts
   ```
-- [ ] 创建基础文件
-  ```bash
-  touch README.md LICENSE .gitignore
+- [ ] 配置 `Cargo.toml` 依赖
+  ```toml
+  [dependencies]
+  clap = { version = "4.0", features = ["derive"] }
+  serde = { version = "1.0", features = ["derive"] }
+  serde_json = "1.0"
+  anyhow = "1.0"
+  dirs = "5.0"
+  which = "4.0"
   ```
 
-#### 1.2 核心功能模块 ⏳
-- [ ] `src/platform/detection.sh` - 平台和 NVM 检测
-  - 检测操作系统 (macOS/Linux/Windows)
-  - 检测 NVM 类型 (nvm/nvm-windows)
-  - 检测当前 Node.js 版本
+#### 1.2 核心 Rust 模块 ⏳
+- [ ] `src/main.rs` - 程序入口和 CLI 接口
+  - 使用 clap 定义命令行参数
+  - 主要命令: `auto-nvm check`, `auto-nvm setup`, `auto-nvm switch`
+  - 错误处理和用户友好的输出
 
-- [ ] `src/core/nvmrc-parser.sh` - .nvmrc 文件处理
-  - 向上递归查找 .nvmrc 文件
-  - 解析和验证版本号格式
-  - 错误处理
+- [ ] `src/nvmrc/mod.rs` - .nvmrc 文件处理模块
+  - 向上递归查找 .nvmrc 文件 (`std::path::Path`)
+  - 解析版本号格式 (支持语义化版本)
+  - 验证版本号有效性
+  - 优雅的错误处理 (`anyhow::Result`)
 
-- [ ] `src/core/version-manager.sh` - 版本切换逻辑
-  - NVM 命令抽象层
-  - 版本切换执行
-  - 切换结果验证
+- [ ] `src/nvm/mod.rs` - NVM 命令抽象层
+  - 检测 NVM 类型 (Unix nvm vs Windows nvm-windows)
+  - 抽象 NVM 命令接口
+  - 执行版本切换命令
+  - 验证切换结果
 
-- [ ] `src/core/config.sh` - 配置管理
-  - 加载默认配置
+- [ ] `src/config/mod.rs` - 配置管理模块
+  - 使用 `serde` 处理配置序列化
+  - 支持 TOML/JSON 配置文件
   - 环境变量覆盖
-  - 配置验证
+  - 默认配置值
 
-- [ ] `src/core/auto-nvm-core.sh` - 主入口逻辑
-  - 协调所有模块
-  - 主要业务流程
-  - 错误处理和日志
+#### 1.3 基础命令实现 ⏳
+- [ ] `check` 命令 - 检查当前目录
+  - 查找 .nvmrc 文件
+  - 显示当前和目标 Node.js 版本
+  - 输出是否需要切换
 
-#### 1.3 Bash 集成 ⏳
-- [ ] `src/shells/bash/auto-nvm.bash` - Bash Shell 集成
-  - cd 命令钩子实现
-  - 原始 cd 功能保留
-  - Shell 初始化函数
+- [ ] `switch` 命令 - 执行版本切换
+  - 调用 NVM 命令切换版本
+  - 验证切换成功
+  - 输出切换结果
 
-#### 1.4 基础配置 ⏳
-- [ ] `config/auto-nvm.conf` - 默认配置文件
-  - 启用/禁用开关
-  - 基础行为配置
-  - 日志级别设置
-
-#### 1.5 基础文档 ⏳
+#### 1.4 基础文档 ⏳
 - [ ] `README.md` - 项目介绍
-  - 项目描述和特性
-  - 快速开始指南
+  - 项目描述和 Rust 实现优势
+  - 安装方式 (cargo install)
   - 基本使用方法
 
 ### 测试验证
 - [ ] 创建测试 .nvmrc 文件
-- [ ] 验证 cd 触发机制
-- [ ] 验证版本切换功能
-- [ ] 验证错误处理
+- [ ] 验证 `auto-nvm check` 命令
+- [ ] 验证 `auto-nvm switch` 命令
+- [ ] 单元测试核心模块 (`cargo test`)
 
 ### 阶段产出
-✅ 可在 bash 环境下工作的基本 auto-nvm 版本
+✅ 基础的 Rust CLI 工具，支持手动版本切换
 
 ---
 
-## 第二阶段：安装部署系统
-**目标**: 提供便捷的安装方式和多 Shell 支持
+## 第二阶段：Shell 集成系统
+**目标**: 实现自动 Shell 集成和 cd 钩子
 **预期时间**: 2-3 天
-**成功标准**: 用户可以一键安装并在多种 Shell 中使用
+**成功标准**: 用户 cd 到目录时自动切换 Node.js 版本
 
 ### 任务清单
 
-#### 2.1 安装脚本 ⏳
-- [ ] `install.sh` - Unix/macOS 安装脚本
-  - 自动检测用户 Shell 类型
-  - 下载和安装文件
-  - 自动配置 Shell 集成
-  - 权限和路径设置
+#### 2.1 Shell 检测和配置 ⏳
+- [ ] `setup` 命令实现 - 自动配置 Shell 集成
+  - 检测用户当前使用的 Shell (`$SHELL` 环境变量)
+  - 自动生成对应的 Shell 集成脚本
+  - 修改用户的 Shell 配置文件 (`.bashrc`, `.zshrc` 等)
+  - 提供手动配置说明
 
-#### 2.2 多 Shell 支持扩展 ⏳
-- [ ] `src/shells/zsh/auto-nvm.zsh` - Zsh 支持
-  - chpwd 钩子实现
-  - Zsh 特定的自动加载
-  - 兼容性处理
+#### 2.2 多 Shell 支持实现 ⏳
+- [ ] `shell-integration/bash/auto-nvm.bash` - Bash 支持
+  - cd 命令包装器 (`function cd()`)
+  - 调用 `auto-nvm check` 并在需要时自动切换
+  - 保持原始 cd 功能
 
-- [ ] `src/shells/fish/auto-nvm.fish` - Fish 支持
-  - Fish 函数包装器
+- [ ] `shell-integration/zsh/auto-nvm.zsh` - Zsh 支持
+  - 使用 `chpwd` 钩子函数
+  - Zsh 特定的函数定义
+  - 兼容 Oh My Zsh
+
+- [ ] `shell-integration/fish/auto-nvm.fish` - Fish 支持
+  - 使用 Fish 的 `cd` 函数包装
   - Fish 特定语法适配
-  - 事件处理机制
+  - 事件驱动机制
 
-- [ ] `src/shells/powershell/Auto-NVM.psm1` - PowerShell 支持
+- [ ] `shell-integration/powershell/auto-nvm.psm1` - PowerShell 支持
   - PowerShell 模块结构
-  - Set-Location 包装器
-  - Windows 特定处理
+  - `Set-Location` 函数包装
+  - Windows 路径处理
 
-#### 2.3 用户交互优化 ⏳
-- [ ] `src/utils/prompts.sh` - 用户交互
-  - 版本安装确认提示
-  - 友好的错误信息
-  - 进度反馈
+#### 2.3 Rust 端增强 ⏳
+- [ ] 添加 `--quiet` 模式 - Shell 集成专用
+  - 静默执行，只输出必要信息
+  - 优化性能，减少输出延迟
+  - 返回简洁的状态码
 
-- [ ] `src/utils/logging.sh` - 日志系统
-  - 分级日志输出
-  - 调试信息支持
-  - 日志格式标准化
-
-#### 2.4 Windows 支持 ⏳
-- [ ] `install.ps1` - Windows PowerShell 安装脚本
-- [ ] Windows 特定的路径处理
-- [ ] nvm-windows 集成
+- [ ] 改进错误处理
+  - 区分用户错误和系统错误
+  - 提供建设性的错误信息
+  - 日志记录 (可选)
 
 ### 测试验证
-- [ ] 在不同 Shell 中测试安装
-- [ ] 验证自动配置功能
-- [ ] 测试卸载流程
-- [ ] 跨平台兼容性测试
+- [ ] 在不同 Shell 中测试 cd 钩子
+- [ ] 验证自动版本切换功能
+- [ ] 测试 `auto-nvm setup` 命令
+- [ ] 跨平台兼容性测试 (macOS/Linux/Windows)
 
 ### 阶段产出
-✅ 支持多 Shell 的完整安装体验
+✅ 完整的自动切换功能，支持主要 Shell
 
 ---
 
-## 第三阶段：性能优化
-**目标**: 提升响应速度和用户体验
+## 第三阶段：性能优化和缓存
+**目标**: 实现高性能缓存系统，达到 < 500ms 目标
 **预期时间**: 1-2 天
 **成功标准**: 切换延迟 < 500ms，智能缓存工作正常
 
 ### 任务清单
 
-#### 3.1 缓存系统 ⏳
-- [ ] `src/core/cache.sh` - 缓存机制实现
-  - .nvmrc 文件位置缓存
-  - 版本信息缓存
-  - TTL 过期机制
-  - 缓存清理功能
+#### 3.1 缓存系统实现 ⏳
+- [ ] `src/cache/mod.rs` - 缓存机制实现
+  - .nvmrc 文件位置缓存 (目录 -> .nvmrc 路径映射)
+  - 当前版本信息缓存
+  - 基于文件修改时间的 TTL 机制
+  - 使用 `serde` 序列化缓存数据到 JSON
 
 #### 3.2 性能优化策略 ⏳
-- [ ] 智能跳过重复处理
-  - 检测目录是否真正改变
-  - 避免重复的版本切换
-  - 缓存命中优化
+- [ ] 智能跳过机制
+  - 检测当前目录是否与上次相同
+  - 缓存当前 Node.js 版本，避免重复查询
+  - 只在 .nvmrc 内容变化时重新解析
 
-- [ ] 目录排除机制
-  - 系统目录排除 (/tmp, /var 等)
-  - 用户自定义排除列表
-  - 性能敏感路径优化
+- [ ] 目录排除优化
+  - 内置系统目录排除列表 (`/tmp`, `/var`, `/proc` 等)
+  - 用户自定义排除配置
+  - 快速路径匹配算法
 
-- [ ] 延迟加载优化
-  - 按需加载 NVM
-  - 模块懒加载
-  - 启动时间优化
+- [ ] Rust 性能优化
+  - 使用 `std::collections::HashMap` 优化查找
+  - 减少不必要的文件系统操作
+  - 优化字符串处理和路径操作
 
-#### 3.3 高级配置 ⏳
-- [ ] 性能调优参数
+#### 3.3 高级配置选项 ⏳
+- [ ] 扩展配置文件功能
   - 缓存 TTL 配置
-  - 排除目录配置
-  - 日志级别动态调整
+  - 排除目录列表
+  - 日志级别设置
+  - 自动安装缺失版本选项
 
-- [ ] 更多配置选项
-  - 自动安装缺失版本
-  - 版本切换确认
-  - 自定义提示消息
+- [ ] 用户体验优化
+  - 版本切换确认提示 (可配置)
+  - 自定义成功/错误消息
+  - 进度指示器 (长时间操作)
 
 ### 测试验证
-- [ ] 性能基准测试
+- [ ] 性能基准测试 (`cargo bench`)
 - [ ] 缓存有效性测试
-- [ ] 大量目录切换测试
-- [ ] 内存使用监控
+- [ ] 大量目录切换压力测试
+- [ ] 内存使用分析 (`valgrind` 或 `heaptrack`)
 
 ### 阶段产出
-✅ 高性能的生产就绪版本
+✅ 高性能的生产就绪版本，满足 < 500ms 性能目标
 
 ---
 
-## 第四阶段：测试和文档
-**目标**: 完善测试覆盖和用户文档
+## 第四阶段：测试、文档和发布准备
+**目标**: 完善测试覆盖、文档和多种分发方式
 **预期时间**: 2-3 天
-**成功标准**: 完整的测试覆盖，用户可以轻松上手使用
+**成功标准**: 完整的测试覆盖，支持多种分发方式
 
 ### 任务清单
 
-#### 4.1 测试套件 ⏳
-- [ ] `tests/unit/` - 单元测试
-  - 核心函数测试
-  - 边界条件测试
+#### 4.1 Rust 测试套件 ⏳
+- [ ] 单元测试 (`src/*/mod.rs` 中的 `#[cfg(test)]`)
+  - .nvmrc 解析功能测试
+  - 配置管理测试
+  - 缓存系统测试
   - 错误处理测试
 
-- [ ] `tests/integration/` - 集成测试
-  - Shell 集成测试
-  - 端到端流程测试
-  - 多场景验证
+- [ ] 集成测试 (`tests/` 目录)
+  - CLI 命令集成测试
+  - Shell 集成端到端测试
+  - 跨平台兼容性测试
 
-- [ ] 跨平台兼容性验证
-  - macOS 测试
-  - Linux 测试
-  - Windows 测试
+- [ ] 性能测试 (`benches/` 目录)
+  - 使用 `criterion` 进行性能基准测试
+  - 缓存命中率测试
+  - 内存使用测试
 
-#### 4.2 完整文档 ⏳
-- [ ] `docs/installation.md` - 安装指南
-  - 系统要求
-  - 详细安装步骤
-  - 常见问题解决
+#### 4.2 分发方式准备 ⏳
+- [ ] Cargo 发布准备
+  - 完善 `Cargo.toml` 元数据
+  - 准备 crates.io 发布
+  - 设置 CI/CD 自动发布
 
-- [ ] `docs/configuration.md` - 配置说明
-  - 所有配置选项说明
-  - 配置文件示例
-  - 高级配置技巧
+- [ ] 预编译二进制支持
+  - GitHub Actions 交叉编译
+  - 支持 `cargo-binstall`
+  - 多平台二进制发布
 
-- [ ] `docs/troubleshooting.md` - 故障排除
-  - 常见问题和解决方案
-  - 调试技巧
-  - 日志分析指南
+- [ ] 包管理器支持 (可选)
+  - Homebrew Formula 模板
+  - Scoop manifest 模板
+  - 安装脚本模板
 
-- [ ] 使用示例和最佳实践
-  - 典型使用场景
-  - 项目集成指南
-  - 性能优化建议
+#### 4.3 文档和发布 ⏳
+- [ ] `README.md` - 完整项目文档
+  - Rust 实现优势说明
+  - 多种安装方式 (cargo install/预编译/包管理器)
+  - 使用示例和配置说明
 
-#### 4.3 发布准备 ⏳
-- [ ] `LICENSE` 文件 (推荐 MIT)
-- [ ] `CONTRIBUTING.md` - 贡献指南
-- [ ] `CHANGELOG.md` - 版本变更记录
-- [ ] GitHub 发布流程
-- [ ] 版本标记和发布说明
+- [ ] `docs/installation.md` - 详细安装指南
+  - Rust 环境安装指南
+  - 各平台安装方式
+  - 故障排除指南
+
+- [ ] 发布准备
+  - `LICENSE` 文件 (MIT)
+  - `CONTRIBUTING.md` - 贡献指南
+  - `CHANGELOG.md` - 版本变更记录
 
 ### 测试验证
-- [ ] 完整的回归测试
+- [ ] 完整的回归测试 (`cargo test`)
 - [ ] 文档准确性验证
-- [ ] 用户体验测试
-- [ ] 发布流程测试
+- [ ] 多平台用户体验测试
+- [ ] 分发流程测试 (cargo publish/GitHub releases)
 
 ### 阶段产出
-✅ 可发布到 GitHub 的完整开源项目
+✅ 可发布的完整 Rust 项目，支持多种分发方式
 
 ---
 
+## Rust 项目结构
+
+```
+auto-nvm/
+├── Cargo.toml                 # 项目配置和依赖
+├── src/
+│   ├── main.rs               # CLI 入口点
+│   ├── config/
+│   │   └── mod.rs           # 配置管理模块
+│   ├── nvmrc/
+│   │   └── mod.rs           # .nvmrc 文件处理
+│   ├── nvm/
+│   │   └── mod.rs           # NVM 抽象层
+│   └── cache/
+│       └── mod.rs           # 缓存系统
+├── shell-integration/         # Shell 集成脚本
+│   ├── bash/auto-nvm.bash
+│   ├── zsh/auto-nvm.zsh
+│   ├── fish/auto-nvm.fish
+│   └── powershell/auto-nvm.psm1
+├── tests/                    # 集成测试
+├── benches/                  # 性能测试
+├── scripts/                  # 安装脚本 (可选)
+└── docs/                     # 文档
+```
+
 ## 实施建议
 
-### 开发环境准备
-- 确保已安装 nvm 或 nvm-windows
-- 准备不同版本的 Node.js 用于测试
-- 设置多种 Shell 环境进行测试
+### Rust 开发环境准备
+- 安装 Rust 工具链 (`rustup`)
+- 配置开发工具 (VS Code + rust-analyzer)
+- 确保已安装 nvm 或 nvm-windows 用于测试
+- 准备多种 Shell 环境进行测试
 
 ### 质量控制
-- 每个阶段完成后进行充分测试
-- 保持代码简洁和可读性
-- 添加充分的错误处理和日志
+- 使用 `cargo fmt` 保持代码格式一致
+- 使用 `cargo clippy` 进行代码质量检查
+- 每个阶段完成后运行 `cargo test`
+- 添加充分的错误处理和文档注释
 
 ### 版本控制
 - 每个阶段完成后创建 git tag
 - 保持清晰的 commit 历史
-- 及时更新文档
+- 及时更新文档和 CHANGELOG
 
-### 社区准备
-- 选择合适的开源许可证
-- 准备清晰的项目介绍
-- 设置 GitHub 项目模板和标签
+### 分发策略灵活性
+- **开发阶段**: 专注于核心功能实现
+- **测试阶段**: 准备多种分发方式的基础设施
+- **发布阶段**: 根据用户反馈选择主要分发渠道
+- **可选方式**: Cargo install, 预编译二进制, 包管理器, 安装脚本
+
+### 性能目标
+- 目标延迟: < 500ms (Rust 性能优势使这很容易达到)
+- 内存使用: 最小化运行时内存占用
+- 启动时间: 快速冷启动
+- 缓存效率: 智能缓存减少重复计算
