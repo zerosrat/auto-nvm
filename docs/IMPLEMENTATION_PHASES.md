@@ -16,12 +16,11 @@
 
 ### 任务清单
 
-#### 1.1 Cargo 项目初始化 ⏳
-- [ ] 创建 Rust 项目结构
+#### 1.1 Cargo 项目初始化 🔄
+- [x] 创建 Rust 项目结构 ✅ 已完成
   ```bash
-  cargo new auto-nvm --bin
-  cd auto-nvm
-  mkdir -p src/{config,nvmrc,nvm,cache} shell-integration/{bash,zsh,fish,powershell} scripts
+  cargo init  # 已执行，创建了基础项目结构
+  # 待完成：mkdir -p src/{config,nvmrc,nvm,cache} shell-integration/{bash,zsh,fish,powershell} scripts
   ```
 - [ ] 配置 `Cargo.toml` 依赖
   ```toml
