@@ -34,24 +34,24 @@
   ```
 
 #### 1.2 核心 Rust 模块 ⏳
-- [ ] `src/main.rs` - 程序入口和 CLI 接口
+- [x] `src/main.rs` - 程序入口和 CLI 接口
   - 使用 clap 定义命令行参数
   - 主要命令: `auto-nvm check`, `auto-nvm setup`, `auto-nvm switch`
   - 错误处理和用户友好的输出
 
-- [ ] `src/nvmrc/mod.rs` - .nvmrc 文件处理模块
+- [x] `src/nvmrc/mod.rs` - .nvmrc 文件处理模块
   - 向上递归查找 .nvmrc 文件 (`std::path::Path`)
   - 解析版本号格式 (支持语义化版本)
   - 验证版本号有效性
   - 优雅的错误处理 (`anyhow::Result`)
 
-- [ ] `src/nvm/mod.rs` - NVM 命令抽象层
+- [x] `src/nvm/mod.rs` - NVM 命令抽象层
   - 检测 NVM 类型 (Unix nvm vs Windows nvm-windows)
   - 抽象 NVM 命令接口
   - 执行版本切换命令
   - 验证切换结果
 
-- [ ] `src/config/mod.rs` - 配置管理模块
+- [x] `src/config/mod.rs` - 配置管理模块
   - 使用 `serde` 处理配置序列化
   - 支持 TOML/JSON 配置文件
   - 环境变量覆盖
