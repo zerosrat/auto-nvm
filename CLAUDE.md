@@ -25,6 +25,25 @@ Refer to `docs/IMPLEMENTATION_PHASES.md` for detailed task breakdowns and succes
 - `AUTO_NVM_EXCLUDE_DIRS`: Directories to skip processing
 - `AUTO_NVM_LOG_LEVEL`: Logging verbosity (debug, info, warn, error, silent)
 
+## Usage
+
+The `switch` command outputs the nvm command for the current shell to execute via `eval`:
+
+**Fish shell:**
+```fish
+eval (auto-nvm switch)
+```
+
+**Bash/Zsh:**
+```bash
+eval "$(auto-nvm switch)"
+```
+
+**PowerShell:**
+```powershell
+Invoke-Expression (auto-nvm switch)
+```
+
 ## Critical Implementation Notes
 
 - All shell scripts must be POSIX-compatible for maximum portability

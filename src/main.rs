@@ -25,7 +25,11 @@ enum Commands {
     /// Setup shell integration (placeholder for Phase 2)
     Setup,
     /// Execute version switching based on .nvmrc
-    Switch,
+    Switch {
+        /// Print nvm command instead of executing (for use with eval)
+        #[arg(short, long, default_value_t = true)]
+        print: bool,
+    },
 }
 
 fn main() -> Result<()> {
@@ -39,8 +43,8 @@ fn main() -> Result<()> {
         Commands::Setup => {
             handle_setup(&config)?;
         }
-        Commands::Switch => {
-            handle_switch(&config)?;
+        Commands::Switch { print } => {
+            handle_switch(&config, print)?;
         }
     }
 
@@ -107,45 +111,21 @@ fn handle_setup(config: &config::Config) -> Result<()> {
     Ok(())
 }
 
-fn handle_switch(config: &config::Config) -> Result<()> {
-    if !config.is_quiet() {
-        println!("Switching Node.js version...");
-    }
-
+fn handle_switch(_config: &config::Config, _print: bool) -> Result<()> {
     // Find .nvmrc in current directory
     match nvmrc::find_nvmrc_current_dir()? {
         Some(nvmrc_path) => {
             let required_version = nvmrc::parse_nvmrc(&nvmrc_path)?;
             nvmrc::validate_version(&required_version)?;
 
-            if !config.is_quiet() {
-                println!("Found .nvmrc with version: {}", required_version);
-            }
-
-            // Check if nvm is available
-            if !nvm::detect_nvm()? {
-                return Err(anyhow::anyhow!("nvm is not available on this system. Please install nvm first."));
-            }
-
-            // Try to switch to the required version
-            match nvm::switch_version(&required_version) {
-                Ok(_) => {
-                    if !config.is_quiet() {
-                        println!("✓ Successfully switched to Node.js version: {}", required_version);
-
-                        // Verify the switch by getting current version
-                        if let Ok(current_version) = nvm::get_current_version() {
-                            println!("Current Node.js version: {}", current_version);
-                        }
-                    }
-                }
-                Err(e) => {
-                    return Err(anyhow::anyhow!("Failed to switch to version {}: {}", required_version, e));
-                }
-            }
+            // Output nvm command for eval to execute in current shell
+            // This is the only way to affect the parent shell's environment
+            println!("nvm use {}", required_version);
         }
         None => {
-            return Err(anyhow::anyhow!("No .nvmrc file found in current directory. Cannot determine which version to switch to."));
+            // Output to stderr so it doesn't interfere with eval
+            eprintln!("No .nvmrc file found in current directory");
+            std::process::exit(1);
         }
     }
 
