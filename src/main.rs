@@ -1,9 +1,10 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 
 mod config;
 mod nvm;
 mod nvmrc;
+mod shell;
 
 #[derive(Parser)]
 #[command(name = "auto-nvm")]
@@ -22,8 +23,10 @@ struct Cli {
 enum Commands {
     /// Check current directory for .nvmrc and show version info
     Check,
-    /// Setup shell integration (placeholder for Phase 2)
+    /// Setup shell integration
     Setup,
+    /// Uninstall/remove shell integration
+    Uninstall,
     /// Execute version switching based on .nvmrc
     Switch {
         /// Print nvm command instead of executing (for use with eval)
@@ -42,6 +45,9 @@ fn main() -> Result<()> {
         }
         Commands::Setup => {
             handle_setup(&config)?;
+        }
+        Commands::Uninstall => {
+            handle_uninstall(&config)?;
         }
         Commands::Switch { print } => {
             handle_switch(&config, print)?;
@@ -106,8 +112,118 @@ fn handle_setup(config: &config::Config) -> Result<()> {
     if !config.is_quiet() {
         println!("Setting up shell integration...");
     }
-    // TODO: Implement shell setup (placeholder for Phase 2)
-    println!("Setup functionality will be implemented in Phase 2");
+
+    // Detect user's current shell
+    let shell = nvm::detect_shell();
+    let shell_name = match shell {
+        nvm::ShellType::Bash => "Bash",
+        nvm::ShellType::Zsh => "Zsh",
+        nvm::ShellType::Fish => "Fish",
+        nvm::ShellType::PowerShell => "PowerShell",
+    };
+
+    if !config.is_quiet() {
+        println!("Detected shell: {}", shell_name);
+    }
+
+    // Get the config file path for this shell
+    let config_path = shell::get_config_file_path(shell)
+        .context("Could not determine shell config file path")?;
+
+    if !config.is_quiet() {
+        println!("Config file: {}", config_path.display());
+    }
+
+    // Check if already configured
+    if shell::check_already_configured(&config_path) {
+        if !config.is_quiet() {
+            println!("Auto-NVM is already configured in {}", config_path.display());
+            println!("To reinstall, first run: auto-nvm uninstall");
+        }
+        return Ok(());
+    }
+
+    // Generate the integration script
+    let integration_script = shell::generate_integration_script(shell);
+
+    // Create backup of the config file
+    let backup_path = shell::backup_config_file(&config_path)
+        .context("Failed to create backup of config file")?;
+
+    if !config.is_quiet() {
+        println!("Backup created: {}", backup_path.display());
+    }
+
+    // Append the integration script to the config file
+    shell::append_to_config_file(&config_path, &integration_script)
+        .context("Failed to append integration script to config file")?;
+
+    if !config.is_quiet() {
+        println!();
+        println!("Shell integration configured successfully!");
+        println!();
+        println!("To activate the changes:");
+        println!("  - Restart your shell, or");
+        println!("  - Run: source {}", config_path.display());
+        println!();
+        println!("To remove auto-nvm integration later, run:");
+        println!("  auto-nvm uninstall");
+    }
+
+    Ok(())
+}
+
+fn handle_uninstall(config: &config::Config) -> Result<()> {
+    if !config.is_quiet() {
+        println!("Removing shell integration...");
+    }
+
+    // Detect user's current shell
+    let shell = nvm::detect_shell();
+    let shell_name = match shell {
+        nvm::ShellType::Bash => "Bash",
+        nvm::ShellType::Zsh => "Zsh",
+        nvm::ShellType::Fish => "Fish",
+        nvm::ShellType::PowerShell => "PowerShell",
+    };
+
+    if !config.is_quiet() {
+        println!("Detected shell: {}", shell_name);
+    }
+
+    // Get the config file path for this shell
+    let config_path = shell::get_config_file_path(shell)
+        .context("Could not determine shell config file path")?;
+
+    if !config.is_quiet() {
+        println!("Config file: {}", config_path.display());
+    }
+
+    // Check if auto-nvm is configured
+    if !shell::check_already_configured(&config_path) {
+        if !config.is_quiet() {
+            println!("Auto-NVM is not configured in {}", config_path.display());
+        }
+        return Ok(());
+    }
+
+    // Remove the integration
+    let removed = shell::remove_integration_from_config(&config_path)
+        .context("Failed to remove auto-nvm integration")?;
+
+    if !config.is_quiet() {
+        if removed {
+            println!();
+            println!("Auto-NVM integration removed successfully!");
+            println!();
+            println!("To apply the changes:");
+            println!("  - Restart your shell, or");
+            println!("  - Run: source {}", config_path.display());
+        } else {
+            println!("No auto-nvm configuration found to remove.");
+        }
+    }
+
     Ok(())
 }
 
