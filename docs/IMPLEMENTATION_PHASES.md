@@ -136,9 +136,9 @@
   - 日志记录 (可选)
 
 ### 测试验证
-- [ ] 在不同 Shell 中测试 cd 钩子
-- [ ] 验证自动版本切换功能
-- [ ] 测试 `auto-nvm setup` 命令
+- [x] 在不同 Shell 中测试 cd 钩子
+- [x] 验证自动版本切换功能
+- [x] 测试 `auto-nvm setup` 命令
 - [ ] 跨平台兼容性测试 (macOS/Linux/Windows)
 
 ### 阶段产出

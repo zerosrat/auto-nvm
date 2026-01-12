@@ -1,7 +1,25 @@
 [package]
 name = "auto-nvm"
-version = "0.1.0"
+version = "0.1.0-alpha.0"
 edition = "2021"
+description = "Cross-platform Node.js version auto-switcher with multi-shell support"
+license = "MIT"
+repository = "https://github.com/zerosrat/auto-nvm"
+homepage = "https://github.com/zerosrat/auto-nvm"
+documentation = "https://github.com/zerosrat/auto-nvm#readme"
+readme = "README.md"
+keywords = ["nodejs", "nvm", "version-manager", "shell", "cli"]
+categories = ["command-line-utilities", "development-tools"]
+authors = ["zerosrat"]
+exclude = [
+    ".github/*",
+    "tests/*",
+    "docs/*",
+    "shell-integration/*",
+    "scripts/*",
+    "*.md",
+    "install.*"
+]
 
 [dependencies]
 clap = { version = "4.0", features = ["derive"] }
@@ -13,3 +31,16 @@ which = "4.0"
 
 [dev-dependencies]
 tempfile = "3.0"
+
+# Binary installation metadata for cargo-binstall
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/auto-nvm-v{ version }-{ target }{ archive-suffix }"
+bin-dir = "{ bin }{ binary-ext }"
+
+# Release profile optimization
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
