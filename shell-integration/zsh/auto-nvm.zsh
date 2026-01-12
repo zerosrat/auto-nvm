@@ -18,3 +18,21 @@ cd() {
         eval "$(auto-nvm switch)"
     fi
 }
+
+# Startup check function
+__auto_nvm_startup_check() {
+    # Only run once per session
+    if [[ -z "$__AUTO_NVM_STARTUP_CHECKED" ]]; then
+        export __AUTO_NVM_STARTUP_CHECKED=1
+
+        # Check for .nvmrc in current directory and switch if found
+        local nvm_output
+        nvm_output=$(auto-nvm switch --print 2>/dev/null)
+        if [[ -n "$nvm_output" ]]; then
+            eval "$(auto-nvm switch 2>/dev/null)" || true
+        fi
+    fi
+}
+
+# Run startup check
+__auto_nvm_startup_check

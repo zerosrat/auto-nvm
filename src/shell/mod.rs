@@ -75,6 +75,22 @@ cd() {
     fi
 }
 
+# Startup check function
+__auto_nvm_startup_check() {
+    # Only run once per session
+    if [ -z "$__AUTO_NVM_STARTUP_CHECKED" ]; then
+        export __AUTO_NVM_STARTUP_CHECKED=1
+
+        # Check for .nvmrc in current directory and switch if found
+        if [ -n "$(auto-nvm switch --print 2>/dev/null)" ]; then
+            eval "$(auto-nvm switch 2>/dev/null)" || true
+        fi
+    fi
+}
+
+# Run startup check
+__auto_nvm_startup_check
+
 # === AUTO-NVM END ==="#.to_string()
         }
         ShellType::Zsh => {
@@ -100,6 +116,24 @@ cd() {
     fi
 }
 
+# Startup check function
+__auto_nvm_startup_check() {
+    # Only run once per session
+    if [[ -z "$__AUTO_NVM_STARTUP_CHECKED" ]]; then
+        export __AUTO_NVM_STARTUP_CHECKED=1
+
+        # Check for .nvmrc in current directory and switch if found
+        local nvm_output
+        nvm_output=$(auto-nvm switch --print 2>/dev/null)
+        if [[ -n "$nvm_output" ]]; then
+            eval "$(auto-nvm switch 2>/dev/null)" || true
+        fi
+    fi
+}
+
+# Run startup check
+__auto_nvm_startup_check
+
 # === AUTO-NVM END ==="#.to_string()
         }
         ShellType::Fish => {
@@ -118,6 +152,23 @@ function cd --description 'Change directory and run auto-nvm'
         eval (auto-nvm switch)
     end
 end
+
+# Startup check function
+function __auto_nvm_startup_check
+    # Only run once per session
+    if not set -q __AUTO_NVM_STARTUP_CHECKED
+        set -g __AUTO_NVM_STARTUP_CHECKED 1
+
+        # Check for .nvmrc in current directory and switch if found
+        set -l nvm_output (auto-nvm switch --print 2>/dev/null)
+        if test -n "$nvm_output"
+            eval (auto-nvm switch 2>/dev/null); or true
+        end
+    end
+end
+
+# Run startup check
+__auto_nvm_startup_check
 
 # === AUTO-NVM END ==="#.to_string()
         }
@@ -141,6 +192,28 @@ function Set-Location {
         Invoke-Expression (auto-nvm switch)
     }
 }
+
+# Startup check function
+function Invoke-AutoNvmStartupCheck {
+    # Only run once per session
+    if (-not $global:__AUTO_NVM_STARTUP_CHECKED) {
+        $global:__AUTO_NVM_STARTUP_CHECKED = $true
+
+        # Check for .nvmrc in current directory and switch if found
+        try {
+            $nvmOutput = auto-nvm switch --print 2>$null
+            if ($nvmOutput) {
+                Invoke-Expression (auto-nvm switch 2>$null)
+            }
+        }
+        catch {
+            # Silently ignore errors during startup
+        }
+    }
+}
+
+# Run startup check
+Invoke-AutoNvmStartupCheck
 
 # === AUTO-NVM END ==="#.to_string()
         }

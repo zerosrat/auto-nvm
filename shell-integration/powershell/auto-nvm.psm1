@@ -16,3 +16,25 @@ function Set-Location {
         Invoke-Expression (auto-nvm switch)
     }
 }
+
+# Startup check function
+function Invoke-AutoNvmStartupCheck {
+    # Only run once per session
+    if (-not $global:__AUTO_NVM_STARTUP_CHECKED) {
+        $global:__AUTO_NVM_STARTUP_CHECKED = $true
+
+        # Check for .nvmrc in current directory and switch if found
+        try {
+            $nvmOutput = auto-nvm switch --print 2>$null
+            if ($nvmOutput) {
+                Invoke-Expression (auto-nvm switch 2>$null)
+            }
+        }
+        catch {
+            # Silently ignore errors during startup
+        }
+    }
+}
+
+# Run startup check
+Invoke-AutoNvmStartupCheck

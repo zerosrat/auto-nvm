@@ -12,3 +12,20 @@ function cd --description 'Change directory and run auto-nvm'
         eval (auto-nvm switch)
     end
 end
+
+# Startup check function
+function __auto_nvm_startup_check
+    # Only run once per session
+    if not set -q __AUTO_NVM_STARTUP_CHECKED
+        set -g __AUTO_NVM_STARTUP_CHECKED 1
+
+        # Check for .nvmrc in current directory and switch if found
+        set -l nvm_output (auto-nvm switch --print 2>/dev/null)
+        if test -n "$nvm_output"
+            eval (auto-nvm switch 2>/dev/null); or true
+        end
+    end
+end
+
+# Run startup check
+__auto_nvm_startup_check
