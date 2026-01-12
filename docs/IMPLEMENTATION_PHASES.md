@@ -97,40 +97,40 @@
 ### 任务清单
 
 #### 2.1 Shell 检测和配置 ⏳
-- [ ] `setup` 命令实现 - 自动配置 Shell 集成
+- [x] `setup` 命令实现 - 自动配置 Shell 集成
   - 检测用户当前使用的 Shell (`$SHELL` 环境变量)
   - 自动生成对应的 Shell 集成脚本
   - 修改用户的 Shell 配置文件 (`.bashrc`, `.zshrc` 等)
   - 提供手动配置说明
 
 #### 2.2 多 Shell 支持实现 ⏳
-- [ ] `shell-integration/bash/auto-nvm.bash` - Bash 支持
+- [x] `shell-integration/bash/auto-nvm.bash` - Bash 支持
   - cd 命令包装器 (`function cd()`)
   - 调用 `auto-nvm check` 并在需要时自动切换
   - 保持原始 cd 功能
 
-- [ ] `shell-integration/zsh/auto-nvm.zsh` - Zsh 支持
+- [x] `shell-integration/zsh/auto-nvm.zsh` - Zsh 支持
   - 使用 `chpwd` 钩子函数
   - Zsh 特定的函数定义
   - 兼容 Oh My Zsh
 
-- [ ] `shell-integration/fish/auto-nvm.fish` - Fish 支持
+- [x] `shell-integration/fish/auto-nvm.fish` - Fish 支持
   - 使用 Fish 的 `cd` 函数包装
   - Fish 特定语法适配
   - 事件驱动机制
 
-- [ ] `shell-integration/powershell/auto-nvm.psm1` - PowerShell 支持
+- [x] `shell-integration/powershell/auto-nvm.psm1` - PowerShell 支持
   - PowerShell 模块结构
   - `Set-Location` 函数包装
   - Windows 路径处理
 
 #### 2.3 Rust 端增强 ⏳
-- [ ] 添加 `--quiet` 模式 - Shell 集成专用
+- [x] 添加 `--quiet` 模式 - Shell 集成专用
   - 静默执行，只输出必要信息
   - 优化性能，减少输出延迟
   - 返回简洁的状态码
 
-- [ ] 改进错误处理
+- [x] 改进错误处理
   - 区分用户错误和系统错误
   - 提供建设性的错误信息
   - 日志记录 (可选)
