@@ -7,9 +7,9 @@ function cd --description 'Change directory and run auto-nvm'
     builtin cd $argv
 
     # Run auto-nvm switch to check for .nvmrc
-    set -l nvm_output (auto-nvm switch --print 2>/dev/null)
+    set -l nvm_output (auto-nvm --quiet switch --print 2>/dev/null)
     if test -n "$nvm_output"
-        eval (auto-nvm switch)
+        eval (auto-nvm --quiet switch)
     end
 end
 
@@ -20,9 +20,9 @@ function __auto_nvm_startup_check
         set -g __AUTO_NVM_STARTUP_CHECKED 1
 
         # Check for .nvmrc in current directory and switch if found
-        set -l nvm_output (auto-nvm switch --print 2>/dev/null)
+        set -l nvm_output (auto-nvm --quiet switch --print 2>/dev/null)
         if test -n "$nvm_output"
-            eval (auto-nvm switch 2>/dev/null); or true
+            eval (auto-nvm --quiet switch 2>/dev/null); or true
         end
     end
 end

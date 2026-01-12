@@ -11,9 +11,9 @@ function Set-Location {
     & $script:__auto_nvm_original_SetLocation @PSBoundParameters
 
     # Run auto-nvm switch to check for .nvmrc
-    $nvmOutput = auto-nvm switch --print 2>$null
+    $nvmOutput = auto-nvm --quiet switch --print 2>$null
     if ($nvmOutput) {
-        Invoke-Expression (auto-nvm switch)
+        Invoke-Expression (auto-nvm --quiet switch)
     }
 }
 
@@ -25,9 +25,9 @@ function Invoke-AutoNvmStartupCheck {
 
         # Check for .nvmrc in current directory and switch if found
         try {
-            $nvmOutput = auto-nvm switch --print 2>$null
+            $nvmOutput = auto-nvm --quiet switch --print 2>$null
             if ($nvmOutput) {
-                Invoke-Expression (auto-nvm switch 2>$null)
+                Invoke-Expression (auto-nvm --quiet switch 2>$null)
             }
         }
         catch {

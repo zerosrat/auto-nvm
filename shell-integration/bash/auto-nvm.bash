@@ -12,8 +12,8 @@ cd() {
     __auto_nvm_original_cd "$@" || return
 
     # Run auto-nvm switch to check for .nvmrc
-    if [ -n "$(auto-nvm switch --print 2>/dev/null)" ]; then
-        eval "$(auto-nvm switch)"
+    if [ -n "$(auto-nvm --quiet switch --print 2>/dev/null)" ]; then
+        eval "$(auto-nvm --quiet switch)"
     fi
 }
 
@@ -24,8 +24,8 @@ __auto_nvm_startup_check() {
         export __AUTO_NVM_STARTUP_CHECKED=1
 
         # Check for .nvmrc in current directory and switch if found
-        if [ -n "$(auto-nvm switch --print 2>/dev/null)" ]; then
-            eval "$(auto-nvm switch 2>/dev/null)" || true
+        if [ -n "$(auto-nvm --quiet switch --print 2>/dev/null)" ]; then
+            eval "$(auto-nvm --quiet switch 2>/dev/null)" || true
         fi
     fi
 }

@@ -13,9 +13,9 @@ cd() {
 
     # Run auto-nvm switch to check for .nvmrc
     local nvm_output
-    nvm_output=$(auto-nvm switch --print 2>/dev/null)
+    nvm_output=$(auto-nvm --quiet switch --print 2>/dev/null)
     if [ -n "$nvm_output" ]; then
-        eval "$(auto-nvm switch)"
+        eval "$(auto-nvm --quiet switch)"
     fi
 }
 
@@ -27,9 +27,9 @@ __auto_nvm_startup_check() {
 
         # Check for .nvmrc in current directory and switch if found
         local nvm_output
-        nvm_output=$(auto-nvm switch --print 2>/dev/null)
+        nvm_output=$(auto-nvm --quiet switch --print 2>/dev/null)
         if [[ -n "$nvm_output" ]]; then
-            eval "$(auto-nvm switch 2>/dev/null)" || true
+            eval "$(auto-nvm --quiet switch 2>/dev/null)" || true
         fi
     fi
 }
