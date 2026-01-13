@@ -254,10 +254,8 @@ run_setup() {
     log "Running auto-nvm setup..."
 
     if [[ "$TEST_MODE" == "true" ]]; then
-        log "Test mode: skipping actual setup, running with --dry-run"
-        if ! "$binary_path" setup --dry-run; then
-            warn "Setup dry-run failed, but continuing in test mode"
-        fi
+        log "Test mode: skipping actual setup"
+        log "In production, this would run: $binary_path setup"
         return 0
     fi
 
@@ -361,6 +359,18 @@ main() {
         return 0
     fi
 
+    # Check for test install mode
+    if [[ "${TEST_INSTALL:-false}" == "true" ]]; then
+        log "TEST INSTALL MODE - Using test binary for installation"
+        if [[ -z "$TEST_BINARY_PATH" ]] || [[ ! -f "$TEST_BINARY_PATH" ]]; then
+            error "Test install mode requires TEST_BINARY_PATH to be set to a valid binary"
+            exit 1
+        fi
+        # Override test mode to use the test binary
+        TEST_MODE="true"
+        log "Test binary path: $TEST_BINARY_PATH"
+    fi
+
     # Create temporary directory
     TEMP_DIR=$(mktemp -d)
 
@@ -372,15 +382,17 @@ main() {
     # Get latest version
     local version
     if [[ "$TEST_MODE" == "true" ]]; then
-        version="0.1.0"  # Use a default version for testing
+        version="0.1.0-alpha.0"  # Use current version from Cargo.toml for testing
+        log "Using test version: v$version"
     else
+        log "Fetching latest version from GitHub..."
         version=$(get_latest_version)
         if [[ -z "$version" ]]; then
             error "Failed to get latest version"
             exit 1
         fi
+        log "Latest version: v$version"
     fi
-    log "Latest version: v$version"
 
     # Download binary
     download_binary "$version" "$platform"

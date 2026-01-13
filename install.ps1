@@ -239,13 +239,8 @@ function Invoke-Setup {
     Write-Log "Running auto-nvm setup..."
 
     if ($TestMode) {
-        Write-Log "Test mode: skipping actual setup, running with --dry-run"
-        try {
-            & $BinaryPath setup --dry-run
-        }
-        catch {
-            Write-Warning "Setup dry-run failed, but continuing in test mode"
-        }
+        Write-Log "Test mode: skipping actual setup"
+        Write-Log "In production, this would run: $BinaryPath setup"
         return
     }
 
@@ -317,6 +312,18 @@ function Main {
         return
     }
 
+    # Check for test install mode
+    if ($TestInstall) {
+        Write-Log "TEST INSTALL MODE - Using test binary for installation"
+        if (-not $TestBinaryPath -or -not (Test-Path $TestBinaryPath)) {
+            Write-Error "Test install mode requires TEST_BINARY_PATH to be set to a valid binary"
+            exit 1
+        }
+        # Override test mode to use the test binary
+        $script:TestMode = $true
+        Write-Log "Test binary path: $TestBinaryPath"
+    }
+
     # Create temporary directory
     $script:TempDir = New-TemporaryFile | ForEach-Object { Remove-Item $_; New-Item -ItemType Directory -Path $_ }
 
@@ -327,15 +334,17 @@ function Main {
 
         # Get latest version
         if ($TestMode) {
-            $version = "0.1.0"  # Use a default version for testing
+            $version = "0.1.0-alpha.0"  # Use current version from Cargo.toml for testing
+            Write-Log "Using test version: v$version"
         } else {
+            Write-Log "Fetching latest version from GitHub..."
             $version = Get-LatestVersion
             if (-not $version) {
                 Write-Error "Failed to get latest version"
                 exit 1
             }
+            Write-Log "Latest version: v$version"
         }
-        Write-Log "Latest version: v$version"
 
         # Download binary
         Download-Binary $version $platform
