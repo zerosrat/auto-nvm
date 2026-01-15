@@ -14,9 +14,7 @@ impl Config {
 
     /// Create config from command-line arguments
     pub fn from_cli(quiet: bool) -> Self {
-        Self {
-            quiet,
-        }
+        Self { quiet }
     }
 
     /// Check if quiet mode is enabled

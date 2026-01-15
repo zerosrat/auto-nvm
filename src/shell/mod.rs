@@ -1,7 +1,7 @@
+use crate::nvm::ShellType;
 use anyhow::{anyhow, Context, Result};
 use std::fs;
 use std::path::{Path, PathBuf};
-use crate::nvm::ShellType;
 
 /// Marker strings for identifying auto-nvm configuration in config files
 const AUTO_NVM_START: &str = "# === AUTO-NVM START ===";
@@ -11,12 +11,12 @@ const AUTO_NVM_END: &str = "# === AUTO-NVM END ===";
 const BASH_INTEGRATION: &str = include_str!("../../shell-integration/bash/auto-nvm.bash");
 const ZSH_INTEGRATION: &str = include_str!("../../shell-integration/zsh/auto-nvm.zsh");
 const FISH_INTEGRATION: &str = include_str!("../../shell-integration/fish/auto-nvm.fish");
-const POWERSHELL_INTEGRATION: &str = include_str!("../../shell-integration/powershell/auto-nvm.psm1");
+const POWERSHELL_INTEGRATION: &str =
+    include_str!("../../shell-integration/powershell/auto-nvm.psm1");
 
 /// Get the configuration file path for the given shell type
 pub fn get_config_file_path(shell: ShellType) -> Result<PathBuf> {
-    let home_dir = dirs::home_dir()
-        .ok_or_else(|| anyhow!("Could not determine home directory"))?;
+    let home_dir = dirs::home_dir().ok_or_else(|| anyhow!("Could not determine home directory"))?;
 
     match shell {
         ShellType::Bash => {
@@ -28,9 +28,7 @@ pub fn get_config_file_path(shell: ShellType) -> Result<PathBuf> {
                 Ok(home_dir.join(".bash_profile"))
             }
         }
-        ShellType::Zsh => {
-            Ok(home_dir.join(".zshrc"))
-        }
+        ShellType::Zsh => Ok(home_dir.join(".zshrc")),
         ShellType::Fish => {
             let config_dir = home_dir.join(".config/fish");
             Ok(config_dir.join("config.fish"))
@@ -121,8 +119,7 @@ pub fn append_to_config_file(config_path: &Path, script: &str) -> Result<()> {
         .with_context(|| format!("Failed to open config file {}", config_path.display()))?;
 
     use std::io::Write;
-    writeln!(file, "\n{}", script)
-        .context("Failed to write to config file")?;
+    writeln!(file, "\n{}", script).context("Failed to write to config file")?;
 
     Ok(())
 }
@@ -134,8 +131,7 @@ pub fn remove_integration_from_config(config_path: &Path) -> Result<bool> {
         return Ok(false);
     }
 
-    let content = fs::read_to_string(config_path)
-        .context("Failed to read config file")?;
+    let content = fs::read_to_string(config_path).context("Failed to read config file")?;
 
     if !content.contains(AUTO_NVM_START) || !content.contains(AUTO_NVM_END) {
         return Ok(false);
@@ -176,8 +172,7 @@ pub fn remove_integration_from_config(config_path: &Path) -> Result<bool> {
     }
 
     // Write the cleaned content back
-    fs::write(config_path, result.trim_end())
-        .context("Failed to write cleaned config file")?;
+    fs::write(config_path, result.trim_end()).context("Failed to write cleaned config file")?;
 
     Ok(lines_removed > 0)
 }

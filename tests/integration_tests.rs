@@ -1,6 +1,6 @@
-use std::process::Command;
 use std::fs;
 use std::path::Path;
+use std::process::Command;
 use tempfile::TempDir;
 
 /// Helper function to run auto-nvm command in a specific directory

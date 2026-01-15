@@ -80,11 +80,17 @@ fn handle_check(config: &config::Config) -> Result<()> {
                         let current_clean = current_version.trim_start_matches('v');
                         let required_clean = required_version.trim_start_matches('v');
 
-                        if current_clean == required_clean ||
-                           (required_version == "lts" || required_version == "stable" || required_version == "latest") {
+                        if current_clean == required_clean
+                            || (required_version == "lts"
+                                || required_version == "stable"
+                                || required_version == "latest")
+                        {
                             println!("✓ Version matches requirement");
                         } else {
-                            println!("✗ Version mismatch! Required: {}, Current: {}", required_version, current_version);
+                            println!(
+                                "✗ Version mismatch! Required: {}, Current: {}",
+                                required_version, current_version
+                            );
                         }
                     }
                     Err(_) => {
@@ -127,8 +133,8 @@ fn handle_setup(config: &config::Config) -> Result<()> {
     }
 
     // Get the config file path for this shell
-    let config_path = shell::get_config_file_path(shell)
-        .context("Could not determine shell config file path")?;
+    let config_path =
+        shell::get_config_file_path(shell).context("Could not determine shell config file path")?;
 
     if !config.is_quiet() {
         println!("Config file: {}", config_path.display());
@@ -137,7 +143,10 @@ fn handle_setup(config: &config::Config) -> Result<()> {
     // Check if already configured
     if shell::check_already_configured(&config_path) {
         if !config.is_quiet() {
-            println!("Auto-NVM is already configured in {}", config_path.display());
+            println!(
+                "Auto-NVM is already configured in {}",
+                config_path.display()
+            );
             println!("To reinstall, first run: auto-nvm uninstall");
         }
         return Ok(());
@@ -192,8 +201,8 @@ fn handle_uninstall(config: &config::Config) -> Result<()> {
     }
 
     // Get the config file path for this shell
-    let config_path = shell::get_config_file_path(shell)
-        .context("Could not determine shell config file path")?;
+    let config_path =
+        shell::get_config_file_path(shell).context("Could not determine shell config file path")?;
 
     if !config.is_quiet() {
         println!("Config file: {}", config_path.display());
