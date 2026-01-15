@@ -13,26 +13,23 @@ pub enum ShellType {
 
 /// Detect the current shell type based on environment
 pub fn detect_shell() -> ShellType {
-    // First try to detect from SHELL environment variable (works on Unix and in test environments)
-    if let Ok(shell_var) = std::env::var("SHELL") {
-        if shell_var.contains("fish") {
-            return ShellType::Fish;
-        } else if shell_var.contains("zsh") {
-            return ShellType::Zsh;
-        } else if shell_var.contains("bash") {
-            return ShellType::Bash;
-        } else if shell_var.contains("powershell") {
-            return ShellType::PowerShell;
-        }
-    }
-
-    // On Windows, default to PowerShell if SHELL was not detected
+    // On Windows, default to PowerShell
     if cfg!(windows) {
         return ShellType::PowerShell;
     }
 
-    // Default fallback on Unix systems
-    ShellType::Bash
+    // On Unix, detect via SHELL environment variable
+    std::env::var("SHELL")
+        .map(|s| {
+            if s.contains("fish") {
+                ShellType::Fish
+            } else if s.contains("zsh") {
+                ShellType::Zsh
+            } else {
+                ShellType::Bash
+            }
+        })
+        .unwrap_or(ShellType::Bash)
 }
 
 /// Build shell command for nvm operations
