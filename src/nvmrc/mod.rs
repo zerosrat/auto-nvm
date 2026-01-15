@@ -54,7 +54,7 @@ pub fn validate_version(version: &str) -> Result<()> {
     // Check for semantic version format (major.minor.patch or just major)
     if cleaned_version.chars().all(|c| c.is_ascii_digit() || c == '.') {
         let parts: Vec<&str> = cleaned_version.split('.').collect();
-        if parts.len() >= 1 && parts.len() <= 3 {
+        if !parts.is_empty() && parts.len() <= 3 {
             // Validate each part is a number
             for part in parts {
                 if part.is_empty() || !part.chars().all(|c| c.is_ascii_digit()) {
