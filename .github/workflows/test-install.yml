@@ -1,0 +1,197 @@
+name: Test Install Scripts
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'install.sh'
+      - 'install.ps1'
+      - '.github/workflows/test-install.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'install.sh'
+      - 'install.ps1'
+      - '.github/workflows/test-install.yml'
+
+jobs:
+  test-unix-install:
+    name: Test Unix Install Script
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: macos-14  # Apple Silicon
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build local binary for testing
+      run: |
+        # Install Rust for building test binary
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        source ~/.cargo/env
+        cargo build --release
+
+        # Create a mock GitHub release structure for testing
+        mkdir -p mock-release
+        cp target/release/auto-nvm mock-release/
+        tar -czf mock-release/auto-nvm-v0.1.1-$(rustc -vV | sed -n 's|host: ||p').tar.gz -C mock-release auto-nvm
+
+    - name: Test install script (dry run)
+      run: |
+        # Test the install script logic without actually installing
+        chmod +x install.sh
+        # We'll need to mock the download part for testing
+        export AUTO_NVM_TEST_MODE=1
+        export AUTO_NVM_TEST_BINARY_PATH="$(pwd)/target/release/auto-nvm"
+        ./install.sh --dry-run
+
+    - name: Test install script in Docker (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        # Test in clean Ubuntu container
+        docker run --rm -v $(pwd):/workspace ubuntu:22.04 bash -c "
+          apt-get update && apt-get install -y curl
+          cd /workspace
+          chmod +x install.sh
+          export AUTO_NVM_TEST_MODE=1
+          export AUTO_NVM_TEST_BINARY_PATH='/workspace/target/release/auto-nvm'
+          ./install.sh --dry-run
+        "
+
+    - name: Test install script with different shells
+      run: |
+        # Test that the script works with different shells
+        for shell in bash zsh; do
+          if command -v $shell >/dev/null 2>&1; then
+            echo "Testing with $shell..."
+            $shell -c "
+              export AUTO_NVM_TEST_MODE=1
+              export AUTO_NVM_TEST_BINARY_PATH='$(pwd)/target/release/auto-nvm'
+              chmod +x install.sh
+              ./install.sh --dry-run
+            "
+          fi
+        done
+
+  test-windows-install:
+    name: Test Windows Install Script
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build local binary for testing
+      run: |
+        cargo build --release
+
+    - name: Test PowerShell install script
+      run: |
+        # Test the PowerShell install script
+        $env:AUTO_NVM_TEST_MODE = "1"
+        $env:AUTO_NVM_TEST_BINARY_PATH = "$(Get-Location)\target\release\auto-nvm.exe"
+        .\install.ps1 -DryRun
+
+    - name: Test with different PowerShell versions
+      run: |
+        # Test with Windows PowerShell (if available)
+        if (Get-Command powershell.exe -ErrorAction SilentlyContinue) {
+          powershell.exe -Command {
+            $env:AUTO_NVM_TEST_MODE = "1"
+            $env:AUTO_NVM_TEST_BINARY_PATH = "$(Get-Location)\target\release\auto-nvm.exe"
+            .\install.ps1 -DryRun
+          }
+        }
+
+  test-install-integration:
+    name: Test Full Installation Flow
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup test environment (Unix)
+      if: matrix.os != 'windows-latest'
+      run: |
+        # Install Rust and build binary
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        source ~/.cargo/env
+        cargo build --release
+
+        # Create test user directory structure
+        mkdir -p ~/.local/bin
+        export PATH="$HOME/.local/bin:$PATH"
+
+    - name: Setup test environment (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        cargo build --release
+        # Create test user directory structure
+        New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.local\bin"
+        $env:PATH = "$env:USERPROFILE\.local\bin;$env:PATH"
+
+    - name: Test full installation (Unix)
+      if: matrix.os != 'windows-latest'
+      run: |
+        # Test actual installation in isolated environment
+        export AUTO_NVM_TEST_MODE=1
+        export AUTO_NVM_TEST_BINARY_PATH="$(pwd)/target/release/auto-nvm"
+        chmod +x install.sh
+        ./install.sh --test-install
+
+        # Verify installation
+        which auto-nvm
+        auto-nvm --version
+
+    - name: Test full installation (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        # Test actual installation in isolated environment
+        $env:AUTO_NVM_TEST_MODE = "1"
+        $env:AUTO_NVM_TEST_BINARY_PATH = "$(Get-Location)\target\release\auto-nvm.exe"
+        .\install.ps1 -TestInstall
+
+        # Verify installation
+        Get-Command auto-nvm
+        auto-nvm --version
+
+    - name: Test shell integration setup (Unix)
+      if: matrix.os != 'windows-latest'
+      run: |
+        # Test that shell setup works
+        auto-nvm setup --dry-run
+
+        # Test with different shells
+        for shell in bash zsh; do
+          if command -v $shell >/dev/null 2>&1; then
+            echo "Testing shell setup with $shell..."
+            export SHELL=$(which $shell)
+            auto-nvm setup --dry-run
+          fi
+        done
+
+    - name: Test shell integration setup (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        # Test that PowerShell setup works
+        auto-nvm setup --dry-run
+
+    - name: Test uninstallation
+      if: matrix.os != 'windows-latest'
+      run: |
+        # Test that uninstallation works
+        auto-nvm uninstall --dry-run
+
+    - name: Test uninstallation (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        # Test that uninstallation works
+        auto-nvm uninstall --dry-run

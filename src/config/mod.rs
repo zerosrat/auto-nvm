@@ -1,29 +1,20 @@
 /// Basic configuration for auto-nvm
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Config {
     /// Enable quiet mode (suppress non-error output)
     pub quiet: bool,
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            quiet: false,
-        }
-    }
-}
-
 impl Config {
     /// Create a new config with default values
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Create config from command-line arguments
     pub fn from_cli(quiet: bool) -> Self {
-        Self {
-            quiet,
-        }
+        Self { quiet }
     }
 
     /// Check if quiet mode is enabled

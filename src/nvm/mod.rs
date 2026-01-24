@@ -91,14 +91,11 @@ pub fn get_current_version() -> Result<String> {
     // Try to get version using node directly first
     let output = Command::new("node").arg("--version").output();
 
-    match output {
-        Ok(result) => {
-            if result.status.success() {
-                let version = String::from_utf8_lossy(&result.stdout).trim().to_string();
-                return Ok(version);
-            }
+    if let Ok(result) = output {
+        if result.status.success() {
+            let version = String::from_utf8_lossy(&result.stdout).trim().to_string();
+            return Ok(version);
         }
-        Err(_) => {}
     }
 
     // If node is not available, try using nvm current
@@ -119,6 +116,7 @@ pub fn get_current_version() -> Result<String> {
 }
 
 /// Switch to the specified Node.js version using nvm
+#[allow(dead_code)]
 pub fn switch_version(version: &str) -> Result<()> {
     if !detect_nvm()? {
         return Err(anyhow!("nvm is not available on this system"));
@@ -151,6 +149,7 @@ pub fn switch_version(version: &str) -> Result<()> {
 }
 
 /// Check if a specific Node.js version is installed
+#[allow(dead_code)]
 pub fn is_version_installed(version: &str) -> Result<bool> {
     if !detect_nvm()? {
         return Ok(false);
