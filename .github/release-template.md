@@ -1,17 +1,12 @@
 # Auto-NVM v{version}
 
-**Cross-platform Node.js version auto-switcher with multi-shell support**
+**Unix Node.js version auto-switcher with multi-shell support**
 
 ## 🚀 One-Command Installation
 
 ### Unix (Linux/macOS)
 ```bash
 curl -fsSL https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.sh | bash
-```
-
-### Windows (PowerShell)
-```powershell
-iwr -useb https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.ps1 | iex
 ```
 
 The install script automatically:
@@ -31,8 +26,8 @@ Download the appropriate binary for your platform below, extract it, and follow 
 ## 🔧 Features
 
 - 🚀 **Automatic version switching** when you `cd` into directories with `.nvmrc` files
-- 🔧 **Multi-shell support** - Works with Bash, Zsh, Fish, and PowerShell
-- 🌍 **Cross-platform** - Linux, macOS, and Windows
+- 🔧 **Multi-shell support** - Works with Bash, Zsh, and Fish
+- 🌍 **Unix platforms** - Linux and macOS
 - ⚡ **Fast performance** - Built in Rust, < 500ms switching delay
 - 🎯 **Zero configuration** - Works out of the box after setup
 - 🛡️ **Safe and reliable** - Comprehensive error handling
@@ -85,16 +80,14 @@ node --version  # Should show v18.17.0
 | Linux | aarch64 (ARM64) | ✅ Supported |
 | macOS | x86_64 (Intel) | ✅ Supported |
 | macOS | aarch64 (Apple Silicon) | ✅ Supported |
-| Windows | x86_64 | ✅ Supported |
 
 ## 🐚 Shell Support
 
-| Shell | Linux | macOS | Windows | Status |
-|-------|-------|-------|---------|--------|
-| Bash | ✅ | ✅ | ❌ | Supported |
-| Zsh | ✅ | ✅ | ❌ | Supported |
-| Fish | ✅ | ✅ | ❌ | Supported |
-| PowerShell | ❌ | ❌ | ✅ | Supported |
+| Shell | Linux | macOS | Status |
+|-------|-------|-------|--------|
+| Bash | ✅ | ✅ | Supported |
+| Zsh | ✅ | ✅ | Supported |
+| Fish | ✅ | ✅ | Supported |
 
 ## 📁 Asset Checksums
 
@@ -103,9 +96,6 @@ All release assets include SHA256 checksums for verification. Download `checksum
 ```bash
 # Verify download (Linux/macOS)
 sha256sum -c checksums.txt
-
-# Verify download (Windows PowerShell)
-Get-FileHash auto-nvm-v{version}-x86_64-pc-windows-msvc.zip -Algorithm SHA256
 ```
 
 ## 🐛 Issues and Support

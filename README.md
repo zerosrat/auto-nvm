@@ -4,15 +4,15 @@
 [![Release](https://github.com/zerosrat/auto-nvm/workflows/Release/badge.svg)](https://github.com/zerosrat/auto-nvm/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Cross-platform Node.js version auto-switcher with multi-shell support**
+**Unix Node.js version auto-switcher with multi-shell support**
 
-Auto-NVM automatically switches Node.js versions when you `cd` into directories containing `.nvmrc` files. Built with Rust for speed and reliability, supporting Bash, Zsh, Fish, and PowerShell across Linux, macOS, and Windows.
+Auto-NVM automatically switches Node.js versions when you `cd` into directories containing `.nvmrc` files. Built with Rust for speed and reliability, supporting Bash, Zsh, and Fish across Linux and macOS.
 
 ## ✨ Features
 
 - 🚀 **Automatic version switching** - No manual intervention needed
-- 🔧 **Multi-shell support** - Works with Bash, Zsh, Fish, and PowerShell
-- 🌍 **Cross-platform** - Linux, macOS, and Windows
+- 🔧 **Multi-shell support** - Works with Bash, Zsh, and Fish
+- 🌍 **Unix platforms** - Linux and macOS
 - ⚡ **Fast performance** - Built in Rust, < 500ms switching delay
 - 🎯 **Zero configuration** - Works out of the box after setup
 - 🛡️ **Safe and reliable** - Comprehensive error handling and rollback
@@ -25,11 +25,6 @@ Auto-NVM automatically switches Node.js versions when you `cd` into directories 
 **Unix (Linux/macOS):**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.sh | bash
-```
-
-**Windows (PowerShell):**
-```powershell
-iwr -useb https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.ps1 | iex
 ```
 
 That's it! The install script will:
@@ -83,11 +78,6 @@ node --version  # Should show v18.17.0
 curl -fsSL https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.sh | bash
 ```
 
-**Windows:**
-```powershell
-iwr -useb https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.ps1 | iex
-```
-
 ### 2. Build from Source
 
 ```bash
@@ -111,8 +101,6 @@ Integration added to `~/.zshrc`
 ### Fish
 Integration added to `~/.config/fish/config.fish`
 
-### PowerShell
-Integration added to PowerShell profile
 
 ### Manual Shell Setup
 

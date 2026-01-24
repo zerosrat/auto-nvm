@@ -19,11 +19,6 @@ This guide provides detailed installation instructions for auto-nvm on all suppo
 curl -fsSL https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.sh | bash
 ```
 
-### Windows (PowerShell)
-```powershell
-iwr -useb https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.ps1 | iex
-```
-
 The install script will automatically:
 1. Detect your platform and architecture
 2. Download the appropriate binary
@@ -72,31 +67,6 @@ curl -fsSL https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.sh |
 curl -fsSL https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.sh | AUTO_NVM_FORCE=true bash
 ```
 
-#### Windows Installation Options
-
-**Standard installation:**
-```powershell
-iwr -useb https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.ps1 | iex
-```
-
-**Custom install directory:**
-```powershell
-$env:AUTO_NVM_INSTALL_DIR="C:\tools\bin"
-iwr -useb https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.ps1 | iex
-```
-
-**Skip automatic shell setup:**
-```powershell
-$env:AUTO_NVM_AUTO_SETUP="false"
-iwr -useb https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.ps1 | iex
-```
-
-**PowerShell parameters:**
-```powershell
-# Download and run with parameters
-iwr -useb https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.ps1 -OutFile install.ps1
-.\install.ps1 -Force -InstallDir "C:\tools\bin"
-```
 
 ### 2. Manual Binary Installation
 
@@ -110,7 +80,6 @@ If you prefer manual installation or the install script doesn't work for your en
    - **Linux ARM64**: `auto-nvm-v{version}-aarch64-unknown-linux-gnu.tar.gz`
    - **macOS Intel**: `auto-nvm-v{version}-x86_64-apple-darwin.tar.gz`
    - **macOS Apple Silicon**: `auto-nvm-v{version}-aarch64-apple-darwin.tar.gz`
-   - **Windows**: `auto-nvm-v{version}-x86_64-pc-windows-msvc.zip`
 
 #### Step 2: Extract and Install
 
@@ -131,24 +100,6 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-**Windows:**
-```powershell
-# Extract archive (using built-in PowerShell)
-Expand-Archive -Path auto-nvm-v{version}-x86_64-pc-windows-msvc.zip -DestinationPath .
-
-# Create bin directory
-New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.local\bin"
-
-# Move binary
-Move-Item auto-nvm.exe "$env:USERPROFILE\.local\bin\"
-
-# Add to PATH
-$userPath = [Environment]::GetEnvironmentVariable("PATH", "User")
-[Environment]::SetEnvironmentVariable("PATH", "$env:USERPROFILE\.local\bin;$userPath", "User")
-
-# Refresh current session
-$env:PATH = "$env:USERPROFILE\.local\bin;$env:PATH"
-```
 
 #### Step 3: Configure Shell Integration
 
@@ -234,24 +185,6 @@ auto-nvm setup
 - **Zsh**: `~/.zshrc` (default shell on macOS 10.15+)
 - **Fish**: `~/.config/fish/config.fish`
 
-### Windows
-
-#### Supported Versions
-- Windows 10 version 1903 or later
-- Windows 11
-- Windows Server 2019 or later
-
-#### Supported Shells
-- **PowerShell 5.1** (Windows PowerShell)
-- **PowerShell 7+** (PowerShell Core)
-
-#### Dependencies
-- PowerShell (pre-installed on Windows)
-- Internet connection for downloading
-
-#### Installation Locations
-- **User install** (default): `%USERPROFILE%\.local\bin\auto-nvm.exe`
-- **System install**: `C:\Program Files\auto-nvm\auto-nvm.exe` (requires admin)
 
 ## Shell Configuration
 
@@ -316,49 +249,6 @@ end
 # AUTO_NVM_END
 ```
 
-### PowerShell Integration
-
-```powershell
-# AUTO_NVM_START
-# Auto-NVM: Automatic Node.js version switching
-function Set-Location {
-    [CmdletBinding()]
-    param([string]$Path = "")
-
-    if ($Path) {
-        Microsoft.PowerShell.Management\Set-Location $Path
-    } else {
-        Microsoft.PowerShell.Management\Set-Location
-    }
-
-    if (Get-Command auto-nvm -ErrorAction SilentlyContinue) {
-        try {
-            $result = auto-nvm --quiet switch
-            if ($result) {
-                Invoke-Expression $result
-            }
-        } catch {
-            # Silently ignore errors in quiet mode
-        }
-    }
-}
-
-# Alias cd to Set-Location for compatibility
-Set-Alias -Name cd -Value Set-Location -Force
-
-# Check for .nvmrc on shell startup
-if (Get-Command auto-nvm -ErrorAction SilentlyContinue) {
-    try {
-        $result = auto-nvm --quiet switch
-        if ($result) {
-            Invoke-Expression $result
-        }
-    } catch {
-        # Silently ignore errors in quiet mode
-    }
-}
-# AUTO_NVM_END
-```
 
 ## Verification
 
@@ -454,20 +344,6 @@ rm ~/.local/bin/auto-nvm
 # Remove the line: export PATH="$HOME/.local/bin:$PATH"
 ```
 
-#### Windows
-
-```powershell
-# Remove shell integration
-auto-nvm uninstall
-
-# Remove binary
-Remove-Item "$env:USERPROFILE\.local\bin\auto-nvm.exe"
-
-# Remove from PATH
-$userPath = [Environment]::GetEnvironmentVariable("PATH", "User")
-$newPath = $userPath -replace [regex]::Escape("$env:USERPROFILE\.local\bin;"), ""
-[Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
-```
 
 ## Troubleshooting
 
@@ -590,11 +466,6 @@ Failed to download auto-nvm
 funcsave cd
 ```
 
-**PowerShell:**
-```powershell
-# If PowerShell execution policy blocks scripts
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
 
 **Zsh with Oh My Zsh:**
 ```bash

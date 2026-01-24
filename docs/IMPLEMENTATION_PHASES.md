@@ -1,7 +1,7 @@
 # Auto-NVM Rust 分阶段实现计划
 
 ## 项目概述
-创建一个跨平台的 Node.js 版本自动切换器，支持 bash、zsh、fish、powershell，在用户 cd 到包含 .nvmrc 文件的目录时自动切换 Node.js 版本。
+创建一个 Unix 平台的 Node.js 版本自动切换器，支持 bash、zsh、fish，在用户 cd 到包含 .nvmrc 文件的目录时自动切换 Node.js 版本。
 
 **技术栈**: Rust + 最小化 Shell 集成脚本
 **性能目标**: < 500ms 切换延迟
@@ -46,7 +46,7 @@
   - 优雅的错误处理 (`anyhow::Result`)
 
 - [x] `src/nvm/mod.rs` - NVM 命令抽象层
-  - 检测 NVM 类型 (Unix nvm vs Windows nvm-windows)
+  - 检测 NVM 类型 (Unix nvm)
   - 抽象 NVM 命令接口
   - 执行版本切换命令
   - 验证切换结果
@@ -119,10 +119,6 @@
   - Fish 特定语法适配
   - 事件驱动机制
 
-- [x] `shell-integration/powershell/auto-nvm.psm1` - PowerShell 支持
-  - PowerShell 模块结构
-  - `Set-Location` 函数包装
-  - Windows 路径处理
 
 #### 2.3 Rust 端增强 ⏳
 - [x] 添加 `--quiet` 模式 - Shell 集成专用
@@ -139,7 +135,7 @@
 - [x] 在不同 Shell 中测试 cd 钩子
 - [x] 验证自动版本切换功能
 - [x] 测试 `auto-nvm setup` 命令
-- [ ] 跨平台兼容性测试 (macOS/Linux/Windows)
+- [ ] 跨平台兼容性测试 (macOS/Linux)
 
 ### 阶段产出
 ✅ 完整的自动切换功能，支持主要 Shell
@@ -284,8 +280,7 @@ auto-nvm/
 ├── shell-integration/         # Shell 集成脚本
 │   ├── bash/auto-nvm.bash
 │   ├── zsh/auto-nvm.zsh
-│   ├── fish/auto-nvm.fish
-│   └── powershell/auto-nvm.psm1
+│   └── fish/auto-nvm.fish
 ├── tests/                    # 集成测试
 ├── benches/                  # 性能测试
 ├── scripts/                  # 安装脚本 (可选)

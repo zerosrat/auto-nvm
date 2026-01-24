@@ -9,9 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Phase 4 distribution infrastructure
-- Universal install scripts for Unix and Windows
+- Universal install scripts for Unix platforms
 - Comprehensive CI/CD pipeline with GitHub Actions
-- Cross-platform binary releases
+- Cross-platform binary releases (Linux/macOS)
 - Complete documentation suite
 - cargo-binstall support metadata
 
@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release with core functionality (Phase 1 & 2 complete)
 - Cross-platform Node.js version auto-switcher
-- Multi-shell support (Bash, Zsh, Fish, PowerShell)
+- Multi-shell support (Bash, Zsh, Fish)
 - Automatic .nvmrc detection and version switching
 - Shell integration with `cd` command wrapping
 - Manual commands: `check`, `switch`, `setup`, `uninstall`
@@ -43,7 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `shell-integration/bash/auto-nvm.bash` - Bash support
 - `shell-integration/zsh/auto-nvm.zsh` - Zsh support
 - `shell-integration/fish/auto-nvm.fish` - Fish support
-- `shell-integration/powershell/auto-nvm.psm1` - PowerShell support
 
 ### Testing
 - Unit tests for all core modules
@@ -75,8 +74,8 @@ This is the first functional release of auto-nvm, providing a complete Node.js v
 
 **Key Features:**
 - ✅ **Automatic Switching**: Detects `.nvmrc` files and switches Node.js versions automatically
-- ✅ **Multi-Shell Support**: Works with Bash, Zsh, Fish, and PowerShell
-- ✅ **Cross-Platform**: Supports Linux, macOS, and Windows
+- ✅ **Multi-Shell Support**: Works with Bash, Zsh, and Fish
+- ✅ **Unix Platforms**: Supports Linux and macOS
 - ✅ **Fast Performance**: Built in Rust for speed and reliability
 - ✅ **Easy Setup**: One command configures shell integration
 - ✅ **Safe Operations**: Comprehensive error handling and rollback
@@ -107,7 +106,7 @@ auto-nvm uninstall
 
 **New Features:**
 - 🚀 **One-Command Installation**: Universal install scripts for all platforms
-- 📦 **Pre-Compiled Binaries**: GitHub Releases with cross-platform binaries
+- 📦 **Pre-Compiled Binaries**: GitHub Releases with Unix binaries
 - 🔄 **Automated CI/CD**: Complete testing and release pipeline
 - 📚 **Complete Documentation**: Comprehensive guides and troubleshooting
 - 🛠️ **cargo-binstall Support**: Fast binary installation for Rust users
@@ -116,9 +115,6 @@ auto-nvm uninstall
 ```bash
 # Unix (Linux/macOS)
 curl -fsSL https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.sh | bash
-
-# Windows (PowerShell)
-iwr -useb https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.ps1 | iex
 ```
 
 ---
