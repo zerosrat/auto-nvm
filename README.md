@@ -80,35 +80,15 @@ node --version  # Should show v18.17.0
 
 **Unix:**
 ```bash
-# Standard installation
 curl -fsSL https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.sh | bash
-
-# Custom install directory
-curl -fsSL https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.sh | AUTO_NVM_INSTALL_DIR=/usr/local/bin bash
-
-# Skip automatic shell setup
-curl -fsSL https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.sh | AUTO_NVM_AUTO_SETUP=false bash
 ```
 
 **Windows:**
 ```powershell
-# Standard installation
 iwr -useb https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.ps1 | iex
-
-# Custom install directory
-$env:AUTO_NVM_INSTALL_DIR="C:\tools\bin"; iwr -useb https://raw.githubusercontent.com/zerosrat/auto-nvm/main/install.ps1 | iex
 ```
 
-### 2. Manual Installation
-
-1. **Download pre-compiled binary** from [GitHub Releases](https://github.com/zerosrat/auto-nvm/releases)
-2. **Extract and install** to a directory in your PATH
-3. **Run setup** to configure shell integration:
-   ```bash
-   auto-nvm setup
-   ```
-
-### 3. Build from Source
+### 2. Build from Source
 
 ```bash
 git clone https://github.com/zerosrat/auto-nvm.git
@@ -206,4 +186,4 @@ auto-nvm uninstall
 
 ---
 
-**Made with ❤️ and Rust**
+**Made with 🐟 and Rust**

@@ -108,15 +108,6 @@ sha256sum -c checksums.txt
 Get-FileHash auto-nvm-v{version}-x86_64-pc-windows-msvc.zip -Algorithm SHA256
 ```
 
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
-
-- Setting up the development environment
-- Running tests
-- Submitting pull requests
-- Reporting issues
-
 ## 🐛 Issues and Support
 
 - **Bug Reports**: [GitHub Issues](https://github.com/zerosrat/auto-nvm/issues)
@@ -129,6 +120,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made with ❤️ and Rust**
+**Made with 🐟 and Rust**
 
 For more information, visit the [project repository](https://github.com/zerosrat/auto-nvm).
