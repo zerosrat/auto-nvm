@@ -95,6 +95,16 @@ jobs:
         sha256sum auto-nvm-v${{ steps.get_version.outputs.VERSION }}-*.tar.gz > checksums.txt
         cat checksums.txt
 
+    - name: Commit release archives to repository
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        mkdir -p releases
+        cp auto-nvm-v${{ steps.get_version.outputs.VERSION }}-*.tar.gz releases/
+        git add releases/
+        git commit -m "Update release archives for v${{ steps.get_version.outputs.VERSION }}"
+        git push
+
     - name: Determine if prerelease
       id: prerelease
       run: |

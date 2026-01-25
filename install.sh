@@ -116,7 +116,7 @@ download_binary() {
     fi
 
     archive_name="auto-nvm-v${version}-${platform}.tar.gz"
-    download_url="${REPO_URL}/releases/download/v${version}/${archive_name}"
+    download_url="https://cdn.jsdelivr.net/gh/zerosrat/auto-nvm@main/releases/${archive_name}"
 
     log "Downloading auto-nvm v${version} for ${platform}..."
     log "URL: $download_url"
