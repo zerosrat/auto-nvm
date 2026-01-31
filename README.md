@@ -144,7 +144,7 @@ auto-nvm setup
 ### `auto-nvm uninstall`
 Remove shell integration (keeps binary):
 ```bash
-auto-nvm uninstall
+sudo auto-nvm uninstall
 # Output: Removed auto-nvm integration from ~/.zshrc
 ```
 

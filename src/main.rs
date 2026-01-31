@@ -5,6 +5,7 @@ mod config;
 mod nvm;
 mod nvmrc;
 mod shell;
+mod uninstall;
 
 #[derive(Parser)]
 #[command(name = "auto-nvm")]
@@ -183,57 +184,8 @@ fn handle_setup(config: &config::Config) -> Result<()> {
 }
 
 fn handle_uninstall(config: &config::Config) -> Result<()> {
-    if !config.is_quiet() {
-        println!("Removing shell integration...");
-    }
-
-    // Detect user's current shell
-    let shell = nvm::detect_shell();
-    let shell_name = match shell {
-        nvm::ShellType::Bash => "Bash",
-        nvm::ShellType::Zsh => "Zsh",
-        nvm::ShellType::Fish => "Fish",
-        nvm::ShellType::PowerShell => "PowerShell",
-    };
-
-    if !config.is_quiet() {
-        println!("Detected shell: {}", shell_name);
-    }
-
-    // Get the config file path for this shell
-    let config_path =
-        shell::get_config_file_path(shell).context("Could not determine shell config file path")?;
-
-    if !config.is_quiet() {
-        println!("Config file: {}", config_path.display());
-    }
-
-    // Check if auto-nvm is configured
-    if !shell::check_already_configured(&config_path) {
-        if !config.is_quiet() {
-            println!("Auto-NVM is not configured in {}", config_path.display());
-        }
-        return Ok(());
-    }
-
-    // Remove the integration
-    let removed = shell::remove_integration_from_config(&config_path)
-        .context("Failed to remove auto-nvm integration")?;
-
-    if !config.is_quiet() {
-        if removed {
-            println!();
-            println!("Auto-NVM integration removed successfully!");
-            println!();
-            println!("To apply the changes:");
-            println!("  - Restart your shell, or");
-            println!("  - Run: source {}", config_path.display());
-        } else {
-            println!("No auto-nvm configuration found to remove.");
-        }
-    }
-
-    Ok(())
+    let uninstall_manager = uninstall::UninstallManager::new(config.clone());
+    uninstall_manager.execute()
 }
 
 fn handle_switch(_config: &config::Config, _print: bool) -> Result<()> {
