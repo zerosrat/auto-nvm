@@ -124,7 +124,7 @@ jobs:
       run: |
         gh release create ${{ github.ref_name }} \
           --title "auto-nvm v${{ steps.get_version.outputs.VERSION }}" \
-          --notes-file .github/release-template.md \
+          --generate-notes \
           ${{ steps.prerelease.outputs.flag }} \
           auto-nvm-v${{ steps.get_version.outputs.VERSION }}-*.tar.gz \
           checksums.txt \

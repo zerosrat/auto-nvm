@@ -4,6 +4,8 @@
 [![Release](https://github.com/zerosrat/auto-nvm/workflows/Release/badge.svg)](https://github.com/zerosrat/auto-nvm/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+[English](./README.md) | [中文](./README.zh-CN.md)
+
 **Unix Node.js version auto-switcher with multi-shell support**
 
 Auto-NVM automatically switches Node.js versions when you `cd` into directories containing `.nvmrc` files. Built with Rust for speed and reliability, supporting Bash, Zsh, and Fish across Linux and macOS.
