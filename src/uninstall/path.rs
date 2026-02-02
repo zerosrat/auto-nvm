@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
+use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::env;
 
 /// Information about a PATH entry found in a shell configuration file
 #[derive(Debug, Clone)]
@@ -28,10 +28,14 @@ pub fn remove_path_entries() -> Result<()> {
     }
 
     // Group entries by file for efficient processing
-    let mut files_to_process: std::collections::HashMap<PathBuf, Vec<PathEntry>> = std::collections::HashMap::new();
+    let mut files_to_process: std::collections::HashMap<PathBuf, Vec<PathEntry>> =
+        std::collections::HashMap::new();
 
     for entry in path_entries {
-        files_to_process.entry(entry.file_path.clone()).or_insert_with(Vec::new).push(entry);
+        files_to_process
+            .entry(entry.file_path.clone())
+            .or_insert_with(Vec::new)
+            .push(entry);
     }
 
     // Process each file
@@ -68,8 +72,8 @@ pub fn find_path_entries() -> Result<Vec<PathEntry>> {
 fn get_possible_install_dirs() -> Result<Vec<String>> {
     let mut dirs = Vec::new();
 
-    let home_dir = dirs::home_dir()
-        .ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?;
+    let home_dir =
+        dirs::home_dir().ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?;
 
     // Default installation directory
     dirs.push(home_dir.join(".local/bin").to_string_lossy().to_string());
@@ -90,8 +94,8 @@ fn get_possible_install_dirs() -> Result<Vec<String>> {
 fn get_shell_config_files() -> Result<Vec<PathBuf>> {
     let mut files = Vec::new();
 
-    let home_dir = dirs::home_dir()
-        .ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?;
+    let home_dir =
+        dirs::home_dir().ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?;
 
     // Bash files
     files.push(home_dir.join(".bashrc"));
@@ -200,17 +204,21 @@ fn remove_path_entries_from_file(file_path: &Path, entries: &[PathEntry]) -> Res
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::NamedTempFile;
     use std::io::Write;
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_is_path_export_line() {
-        assert!(is_path_export_line("export PATH=\"$HOME/.local/bin:$PATH\""));
+        assert!(is_path_export_line(
+            "export PATH=\"$HOME/.local/bin:$PATH\""
+        ));
         assert!(is_path_export_line("PATH=\"$HOME/.local/bin:$PATH\""));
         assert!(is_path_export_line("set -gx PATH $HOME/.local/bin $PATH"));
         assert!(is_path_export_line("set PATH $HOME/.local/bin $PATH"));
 
-        assert!(!is_path_export_line("# export PATH=\"$HOME/.local/bin:$PATH\""));
+        assert!(!is_path_export_line(
+            "# export PATH=\"$HOME/.local/bin:$PATH\""
+        ));
         assert!(!is_path_export_line("echo $PATH"));
         assert!(!is_path_export_line(""));
     }
@@ -246,14 +254,12 @@ PATH="$HOME/bin:$PATH"
 "#;
         temp_file.write_all(content.as_bytes()).unwrap();
 
-        let entries = vec![
-            PathEntry {
-                file_path: temp_file.path().to_path_buf(),
-                line_number: 2,
-                line_content: "export PATH=\"$HOME/.local/bin:$PATH\"".to_string(),
-                install_dir: "$HOME/.local/bin".to_string(),
-            }
-        ];
+        let entries = vec![PathEntry {
+            file_path: temp_file.path().to_path_buf(),
+            line_number: 2,
+            line_content: "export PATH=\"$HOME/.local/bin:$PATH\"".to_string(),
+            install_dir: "$HOME/.local/bin".to_string(),
+        }];
 
         remove_path_entries_from_file(temp_file.path(), &entries).unwrap();
 

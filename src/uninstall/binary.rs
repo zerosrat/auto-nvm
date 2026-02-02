@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Context, Result};
+use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::env;
 
 /// Find the auto-nvm binary file in common installation locations
 pub fn find_auto_nvm_binary() -> Result<Option<PathBuf>> {
@@ -34,8 +34,7 @@ fn get_possible_binary_locations() -> Result<Vec<PathBuf>> {
     let mut locations = Vec::new();
 
     // Get home directory
-    let home_dir = dirs::home_dir()
-        .ok_or_else(|| anyhow!("Could not determine home directory"))?;
+    let home_dir = dirs::home_dir().ok_or_else(|| anyhow!("Could not determine home directory"))?;
 
     // Default installation directory
     locations.push(home_dir.join(".local/bin"));
@@ -101,7 +100,8 @@ fn is_auto_nvm_binary(path: &Path) -> Result<bool> {
 
     // For a more thorough check, we could run `auto-nvm --version`
     // but for now, we'll rely on the file name and location
-    let file_name = path.file_name()
+    let file_name = path
+        .file_name()
         .and_then(|name| name.to_str())
         .unwrap_or("");
 
@@ -111,8 +111,8 @@ fn is_auto_nvm_binary(path: &Path) -> Result<bool> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::TempDir;
     use std::fs;
+    use tempfile::TempDir;
 
     #[test]
     fn test_find_auto_nvm_binary_not_found() {

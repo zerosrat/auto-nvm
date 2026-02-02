@@ -1,6 +1,6 @@
+use crate::config::Config;
 use anyhow::{anyhow, Context, Result};
 use std::io::{self, Write};
-use crate::config::Config;
 
 pub mod binary;
 pub mod path;
@@ -91,11 +91,18 @@ impl UninstallManager {
                 println!("🎉 Complete uninstall successful!");
                 println!();
                 println!("Auto-NVM has been completely removed from your system.");
-                println!("You may need to restart your shell or source your shell configuration file.");
+                println!(
+                    "You may need to restart your shell or source your shell configuration file."
+                );
             } else {
-                println!("⚠ Partial uninstall completed ({}/{} operations successful)", success_count, total_count);
+                println!(
+                    "⚠ Partial uninstall completed ({}/{} operations successful)",
+                    success_count, total_count
+                );
                 println!();
-                println!("Some components could not be removed. You may need to remove them manually.");
+                println!(
+                    "Some components could not be removed. You may need to remove them manually."
+                );
             }
         }
 
@@ -112,7 +119,9 @@ impl UninstallManager {
         io::stdout().flush().context("Failed to flush stdout")?;
 
         let mut input = String::new();
-        io::stdin().read_line(&mut input).context("Failed to read user input")?;
+        io::stdin()
+            .read_line(&mut input)
+            .context("Failed to read user input")?;
 
         let input = input.trim().to_lowercase();
         Ok(input == "y" || input == "yes")
