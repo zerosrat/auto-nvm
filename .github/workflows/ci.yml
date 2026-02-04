@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         rust: [stable]
         include:
           # Test on Apple Silicon macOS
@@ -78,9 +78,6 @@ jobs:
           - os: macos-14
             target: aarch64-apple-darwin
             cross: false
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            cross: false
 
     steps:
     - name: Checkout code
@@ -113,13 +110,6 @@ jobs:
     - name: Build release binary (cross)
       if: matrix.cross
       run: cross build --release --target ${{ matrix.target }}
-
-    - name: Upload binary artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: auto-nvm-${{ matrix.target }}
-        path: |
-          target/${{ matrix.target }}/release/auto-nvm${{ matrix.os == 'windows-latest' && '.exe' || '' }}
 
   security:
     name: Security Audit
