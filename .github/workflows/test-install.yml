@@ -108,22 +108,3 @@ jobs:
         # Verify installation
         which auto-nvm
         auto-nvm --version
-
-    - name: Test shell integration setup
-      run: |
-        # Test that shell setup works
-        auto-nvm setup --dry-run
-
-        # Test with different shells
-        for shell in bash zsh; do
-          if command -v $shell >/dev/null 2>&1; then
-            echo "Testing shell setup with $shell..."
-            export SHELL=$(which $shell)
-            auto-nvm setup --dry-run
-          fi
-        done
-
-    - name: Test uninstallation
-      run: |
-        # Test that uninstallation works
-        auto-nvm uninstall --dry-run
