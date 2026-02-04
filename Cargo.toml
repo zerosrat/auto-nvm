@@ -1,6 +1,6 @@
 [package]
 name = "auto-nvm"
-version = "0.1.0-alpha.0"
+version = "0.1.0-alpha.6"
 edition = "2021"
 description = "Cross-platform Node.js version auto-switcher with multi-shell support"
 license = "MIT"
